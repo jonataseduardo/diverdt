@@ -11,6 +11,7 @@
 #' @return data.table with Fst estimated for every SNP 
 
 
+
 wc_fst <-
     function(pop_list){
 
@@ -23,24 +24,17 @@ wc_fst <-
     pop_dt[, N := NULL]
     pop_dt[, G := .GRP, by = .(CHR, CM, POS, VAR, SNP)]
 
-    # Assuming biallelic data
+    # Assuming biallelic data select one variant to estimate the Fst 
     pop_dt <- pop_dt[G %% 2 != 0]
     pop_dt[, `:=`(G = NULL, VAR = NULL)]
 
     setkeyv(pop_dt, c("CHR", "CM", "POS", "SNP"))
 
-    pop_dt
-
-    nbar <- pop_dt[seq(1:r), mean(NCHROBS)]
-
-    nc <- pop_dt[seq(1:r), 
-                 (sum(NCHROBS) - sum(NCHROBS ^ 2) / sum(NCHROBS)) / (r - 1)]
-
-    aux1 <- pop_dt[pop_dt[, .(nbar = nbar, 
-                             nc = nc, 
-                             pbar = mean(NCHROBS * AF) / nbar),
-                  by = .(CHR, CM, POS, SNP)]]
-    
+    aux1 <- pop_dt[pop_dt[, .(nbar = mean(NCHROBS), 
+                              nc = (sum(NCHROBS) - sum(NCHROBS ^ 2) / sum(NCHROBS)) / (r - 1), 
+                              pbar = sum(NCHROBS * AF) / sum(NCHROBS)),
+                          by = .(CHR, CM, POS, SNP)]
+                  ]
     aux1[, G := .GRP, POP]
 
     aux2 <- 
@@ -55,18 +49,16 @@ wc_fst <-
 
     aux2[, G := NULL]
 
-
     fst_dt <- 
       aux2[,`:=`(T1 = ssqr - (pqbar - (r - 1) * ssqr / r) / (nbar - 1), 
                 T2 = (nc - 1) * pqbar / (nbar - 1) + 
-                     (1 + (r -1) * (nbar - nc)/ (nbar - 1)) * ssqr / r)
+                     (1 + (r - 1) * (nbar - nc)/ (nbar - 1)) * ssqr / r)
           ][,
            `:=`(FST = T1 / T2)]
 
     fst_dt[, c("ssqr", "pqbar", "nbar", "nc") := NULL]
 
     fst_dt[ (FST < 0) | is.na(FST) , FST := 0] 
-
 
     return(fst_dt[])
     }
