@@ -65,6 +65,9 @@ wc_fst <-
 
     fst_dt[, c("ssqr", "pqbar", "nbar", "nc") := NULL]
 
+    fst_dt[ (FST < 0) | is.na(FST) , FST := 0] 
+
+
     return(fst_dt[])
     }
 
