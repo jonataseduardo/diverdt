@@ -1,7 +1,6 @@
 #' Estimate the FST using the Wier-Cockerhan formula  
 #'
-#'\code{wc_fst()} reads .bim and .frq plink files
-#' and merge then into one data.table
+#'\code{wc_fst()} estimates the Fst for every variant 
 #' 
 #' @import data.table
 #' @export
@@ -9,7 +8,7 @@
 #' @param  pop_list: list of where each element is a data.table with the
 #' following columns: CHR, SNP, CM, POS, NCHROBS, POP, VAR, AF
 #' 
-#' @return data.table with Fst estimated for every allele 
+#' @return data.table with Fst estimated for every SNP 
 
 
 wc_fst <-
@@ -36,7 +35,6 @@ wc_fst <-
 
     nc <- pop_dt[seq(1:r), 
                  (sum(NCHROBS) - sum(NCHROBS ^ 2) / sum(NCHROBS)) / (r - 1)]
-    
 
     aux1 <- pop_dt[pop_dt[, .(nbar = nbar, 
                              nc = nc, 
@@ -65,6 +63,8 @@ wc_fst <-
           ][,
            `:=`(FST = T1 / T2)]
 
-    return(fst_dt)
+    fst_dt[, c("ssqr", "pqbar", "nbar", "nc") := NULL]
+
+    return(fst_dt[])
     }
 
