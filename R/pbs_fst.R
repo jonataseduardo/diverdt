@@ -20,7 +20,15 @@ pbs_fst <-
     t_fo <- wc_fst(list(focal_pop, out_pop))
     t_co <- wc_fst(list(close_pop, out_pop))
 
-    t_fc[, T := - log(1 - FST)]
+    t_fc[, BS := - log(1 - FST)]
+    t_fo[, BS := - log(1 - FST)]
+    t_co[, BS := - log(1 - FST)]
 
+    setkeyv(t_fc, c("CHR", "CM", "POS", "SNP"))
+    setkeyv(t_fo, c("CHR", "CM", "POS", "SNP"))
+    setkeyv(t_co, c("CHR", "CM", "POS", "SNP"))
 
+    aux <- t_fc[t_fo][t_co][, PBS := BS + i.BS + i.BS.1]
+
+    return(aux[, .(CHR, CM, POS, SNP, PBS)])
     }
