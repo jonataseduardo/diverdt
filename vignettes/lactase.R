@@ -42,6 +42,8 @@ pbs_median <-
   rolling_median_n(pbs_data, col_name = 'PBS', window_s = 20, step_s = 5)
 
 pbs_median[, p_rank := frankv(PBS_MEDIAN) / (.N + 1)]
+pbs_median[, p.value := -log(p_rank)]
+manhattan_plot(pbs_median, fig_name = 'median_illumina.png')
 
 pbs_moran <- 
   rolling_moran_n(pbs_data, col_name = 'PBS', window_s = 20, step_s = 5)
