@@ -1,57 +1,40 @@
 
 #' Evaluete the sliding window mean 
 #'
-#'\code{sw_mean()} estimates the branch size for every SNP 
+#'\code{rolling_mean_n()} evaluetes the rolling mean 
 #' 
 #' @import data.table
 #' @export
 #' 
-#' @param  focal_pop: data.table with the following columns: CHR, SNP, CM, POS,
-#' NCHROBS, POP, VAR, AF.
-#' @param close_pop: data.table
-#' @param out_pop: data.table
+#' @param data_in: data.table with the following columns: CHR, POS, col_name
+#' @param col_name: name of the columns to be take the mean
+#' @param widows_s: number of SNPs in the rolling window
+#' @param step_s: number of SNPs in the rolling window
 #' 
-#' @return data.table with the estimated branch size for every SNP
+#' @return data.table with the rolling mean 
 
-sw_mean <-
-  function(data_w, window_s = 3, step_s = 2){}
- data_w <- z
+rolling_mean_n <-
+  function(data_in, col_name, window_s = 3, step_s = 2){
 
-window_s = 4L
-step_s = 2L
+  aux <- 
+    rolling_index_by_snp_number(data_in, 
+                                window_s = window_s, 
+                                step_s = step_s)
 
-DT  <- data_w[c(1:11, (.N - 9):.N)]
+  res <- aux[[1]]
+  DT <- aux[[2]]
+  setnames(DT, col_name, 'aux')
 
-DT <- data.table( CHR = c(rep(1,9),rep(2,10)), POS = c(sample(1:20, 9),sample(21:40,10)))
-DT[, PBS := 1, by = CHR]
-setkeyv(DT, c('CHR', 'POS'))
-DT[, idx := .I]
-DT[, idx := .I]
-DT[, idd := .I]
-DT[, next_idd := idd + window_s]
+  if(step_s == 1){
+    DT[, MEAN := DT[res$seq, mean(aux), by = res$idx]$V1]
+    DT[, c('aux', 'idx', 'idd', 'next_idd') := NULL]
+  }else{
+    DT[sid %% step_s == 1, MEAN := DT[, .(DT[res$seq, mean(aux), by = res$idx]$V1)]$V1]
+    DT[, c('aux', 'idx', 'idd', 'next_idd', 'sid', 'ss') := NULL]
+    DT <- DT[!is.na(MEAN)]
+  }
 
-res <- DT[DT, .(idx = i.idx, seq = i.idx:idx),
-          by = .EACHI,
-          roll = Inf, 
-          on = c(CHR = 'CHR', idd = 'next_idd')]
-
-res
-
-DT[, md := DT[res$seq, sum(PBS), by = res$idx]$V1]
-DT
-
-DT[, sid := seq(1:.N), by = CHR]
-DT[, ss := sid %% step_s ]
-
-
-res <- DT[DT, .(sid = i.sid, idx = i.idx, seq = i.idx:idx),
-          by = .EACHI,
-          roll = Inf, 
-          on = c(CHR = 'CHR', idd = 'next_idd')]
-
-
-res <- res[sid %% step_s == 1]
-
-DT[sid %% step_s == 1, md := DT[, .(DT[res$seq, sum(PBS), by = res$idx]$V1)]$V1]
-
-DT
+  setnames(DT, 'MEAN', paste0(col_name, '_MEAN'))
+  DT[, W_ID := .I]
+  return(DT)
+}

@@ -1,4 +1,4 @@
-#' Return the windows and the SNPs with the higest scores
+#' Return the windows and the SNPs with the higest sginificance scores
 #'
 #'\code{get_peaks()} Return the windows and the SNPs with the higest scores
 #' 
@@ -7,45 +7,48 @@
 #' 
 #' @param data_raw: data.table with every SNP position 
 #' @param data_sum: data.table with the following columns: CHR, SNP, CM, POS, col_name
-#' @param col_name: Name of the score column 
+#' @param stat_col: Name of the stat column 
+#' @param score_col: Name of the score column 
 #' @param score_th: double with the score thereshold 
+#' @param window_s: integer with the size of the window used in the rolling
+#' statistics 
 #' @param greater: BOOLEAN deafault TRUE 
 #' 
 #' @return data.table 
 
 get_peaks <-
-  function(data_raw, data_sum, col_name, score_th, step_s, greater = TRUE){
+  function(data_raw, data_sum, stat_col, score_col, score_th, window_s, greater = FALSE){
 
+    data_r <- copy(data_raw)
+    data_s <- copy(data_sum)
 
-    data_raw <- pbs_data
-    data_sum <- pbs_mean
+    setnames(data_r, stat_col, 'stat_col')
+    setnames(data_s, score_col, 'score_col')
 
-    
-    score_th <- 0.01
-    col_name <- 'p.value'
-    window_s = 20
+    setkey(data_r, CHR, POS, CM, SNP)
+    setkey(data_s, CHR, POS, CM, SNP)
+    data_r[, idx := .I]
 
-    setnames(data_sum, col_name, 'score_col')
-
-    setkey(data_raw, CHR, POS, CM, SNP)
-    data_raw[, idx := .I]
-
-    setkey(data_sum, CHR, POS, CM, SNP)
-
-    DT <- data_raw[data_sum[score_col < score_th]]
+    if(greater){
+      DT <- data_r[data_s[score_col >= score_th]]
+    }else{
+      DT <- data_r[data_s[score_col <= score_th]]
+    }
 
     conc_i <- 
       unlist(lapply(DT[, idx], function(i) i:(i + window_s - 1)))
-
-    idi <- DT[rep(1:.N, each=window_s), idx]
     
-    setkey(data_raw, idx)
-    data_top <- data_raw[conc_i]
+    setkey(data_r, idx)
+    data_top <- data_r[conc_i]
     data_top[, first_idx := DT[rep(1:.N, each=window_s), idx]]
 
-    data_top[data_top[, .I[PBS == max(PBS)], by = first_idx]$V1]
-
+    data_out <- data_top[data_top[, .I[stat_col == max(stat_col)], by = first_idx]$V1]
     
-    data_raw[res$seq, max(PBS), by = res$idx]
+    DW <- DT[,.(idx, W_ID)]
+    data_out <- data_out[DW, on = c(first_idx = 'idx')]
+    data_out[, c('idx', 'first_idx') := NULL]
+
+    setnames(data_out, 'stat_col', stat_col)
+    return(data_out)
   }
 

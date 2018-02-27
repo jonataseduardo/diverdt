@@ -28,7 +28,7 @@ pbs_fst <-
     setkeyv(t_fo, c("CHR", "CM", "POS", "SNP"))
     setkeyv(t_co, c("CHR", "CM", "POS", "SNP"))
 
-    aux <- t_fc[t_fo][t_co][, PBS := BS + i.BS + i.BS.1]
+    aux <- t_fc[t_fo][t_co][, PBS := 0.5 * (BS + i.BS - i.BS.1)]
 
     return(aux[, .(CHR, CM, POS, SNP, PBS)])
     }

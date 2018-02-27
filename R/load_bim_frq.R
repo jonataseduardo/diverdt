@@ -15,15 +15,15 @@
 #' @return data.table with the information of .bim and .frq files 
 
 load_bim_frq <- 
-  function(file_path, 
+  function(files_path, 
            pop_name = tail(unlist(strsplit(files_path, '/')), n = 1),
            one_allele_perline = TRUE){
 
     freq_data  <- 
       merge(
-        fread(paste0(file_path, ".bim"),
+        fread(paste0(files_path, ".bim"),
               col.names = c("CHR", "SNP", "CM", "POS", "A1", "A2")),
-        fread(paste0(file_path, ".frq")), 
+        fread(paste0(files_path, ".frq")), 
         by = c("CHR", "SNP", "A1", "A2"))
 
     freq_data[, `:=`(POP, pop_name)]

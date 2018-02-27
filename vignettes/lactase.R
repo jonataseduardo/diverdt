@@ -3,13 +3,13 @@ library(data.table)
 devtools::document('~/diverdt')
 devtools::load_all('~/diverdt')
 
-pops <- c('EUR', 'AFR', 'EAS')
+pops <- c('EUR', 'EAS', 'AFR')
 
 pop_list <- 
     lapply(
       pops, 
       function(pop_name){
-        fname <- paste0('~/diverdt/inst/extdata/', pop_name, '_Illumina')
+        fname <- paste0('~/diverdt/inst/extdata/', pop_name, '_Axiom_Human_Origins')
         load_bim_frq(fname)
       }
     )
@@ -29,12 +29,13 @@ system.time(
     pbs_fst(pop_list[[1]], pop_list[[2]], pop_list[[3]])
   )
 
-
 pbs_mean <- 
   rolling_mean_n(pbs_data, col_name = 'PBS', window_s = 20, step_s = 5)
 
 pbs_mean[, p_rank := frankv(PBS_MEAN) / (.N + 1)]
 pbs_mean[, p.value := -log(p_rank)]
+
+pbs_mean[ CHR == 2 & POS >= 136545415 & POS < 136594750]
 
 manhattan_plot(pbs_mean, fig_name = 'mean_illumina.png')
 
@@ -50,4 +51,3 @@ pbs_moran <-
 
 pbs_moran
 manhattan_plot(pbs_moran, fig_name = 'moran_illumina.png')
-
