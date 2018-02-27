@@ -34,5 +34,6 @@ rolling_median_n <-
   }
 
   setnames(DT, 'MEDIAN', paste0(col_name, '_MEDIAN'))
+  DT[, W_ID := .I]
   return(DT)
 }

@@ -54,5 +54,6 @@ rolling_moran_n <-
   DT[, p.value := - le * pnorm(MORAN, 0, 1, low = FALSE, log = TRUE)]
 
   setnames(DT, 'MORAN', paste0(col_name, '_MORAN'))
+  DT[, W_ID := .I]
   return(DT)
 }
