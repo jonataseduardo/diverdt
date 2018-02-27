@@ -16,8 +16,14 @@
 get_peaks <-
   function(data_raw, data_sum, col_name, score_th, step_s, greater = TRUE){
 
+
+    data_raw <- pbs_data
+    data_sum <- pbs_mean
+
+    
     score_th <- 0.01
     col_name <- 'p.value'
+    window_s = 20
 
     setnames(data_sum, col_name, 'score_col')
 
@@ -26,10 +32,20 @@ get_peaks <-
 
     setkey(data_sum, CHR, POS, CM, SNP)
 
-    DT <- data_sum[score_col < score_th][data_raw]
-    gg<-  DT[!is.na(score_col)]
-    gg[, idx_next := idx - shift(idx)]
-    gg
+    DT <- data_raw[data_sum[score_col < score_th]]
 
+    conc_i <- 
+      unlist(lapply(DT[, idx], function(i) i:(i + window_s - 1)))
+
+    idi <- DT[rep(1:.N, each=window_s), idx]
+    
+    setkey(data_raw, idx)
+    data_top <- data_raw[conc_i]
+    data_top[, first_idx := DT[rep(1:.N, each=window_s), idx]]
+
+    data_top[data_top[, .I[PBS == max(PBS)], by = first_idx]$V1]
+
+    
+    data_raw[res$seq, max(PBS), by = res$idx]
   }
 
