@@ -14,6 +14,7 @@
 
 manhattan_plot <-
   function(DT_in, 
+           col_name,
            fig_name = NULL,
            facet_key = NULL){
 
@@ -33,8 +34,8 @@ manhattan_plot <-
 
 
     gm <- 
-      ggplot(DT, aes(x = position, y = p.value, color = as.factor(CHR %% 2))) + 
-        geom_point(size = 0.5) +
+      ggplot(DT, aes_string(x = "position", y = col_name) ) + 
+        geom_point(aes(color = as.factor(CHR %% 2)), size = 0.5) +
         theme_bw(base_family = "serif", base_size = 11) + 
         theme(panel.grid = element_blank(),
               panel.border = element_blank(),
