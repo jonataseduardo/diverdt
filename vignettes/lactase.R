@@ -2,14 +2,13 @@ library(data.table)
 library(ggplot2)
 library(diverdt)
 
-
 pops <- c('EUR', 'EAS', 'AFR')
 
 pop_list1 <- 
     lapply(
       pops, 
       function(pop_name){
-        fname <- paste0('~/diverdt/inst/extdata/', pop_name, '_Illumina')
+        fname <- paste0(system.file("extdata", package = "diverdt"), '/', pop_name, '_Illumina')
         load_bim_frq(fname)
       }
     )
@@ -30,7 +29,7 @@ pbs_mean[, LOG_PVAL := -log(P_RANK)]
 
 peaks <- get_peaks(pbs_data, pbs_mean, stat_col = 'PBS', 
                    score_col = 'LOG_PVAL', score_th = 0.01, 
-                   window_s = 20, greater = TRUE)
+                   window_s = 20, greater = FALSE)
 
 manhattan_plot(pbs_mean, col_name = 'LOG_PVAL', fig_name = 'mean_illumina.png')
 
@@ -43,6 +42,6 @@ pbs_median[, LOG_PVAL := -log(P_RANK)]
 peaks_median <-  
   get_peaks(pbs_data, pbs_median, stat_col = 'PBS', 
             score_col = 'LOG_PVAL', score_th = 0.01, 
-            window_s = 20, greater = TRUE)
+            window_s = 20, greater = FALSE)
 
 manhattan_plot(pbs_median, col_name = 'LOG_PVAL', fig_name = 'median_illumina.png')
