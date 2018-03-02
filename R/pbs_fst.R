@@ -29,6 +29,7 @@ pbs_fst <-
     setkeyv(t_co, c("CHR", "CM", "POS", "SNP"))
 
     aux <- t_fc[t_fo][t_co][, PBS := 0.5 * (BS + i.BS - i.BS.1)]
+    aux <- aux[!is.na(PBS)]
     aux[PBS <0, PBS := 0]
 
     return(aux[, .(CHR, CM, POS, SNP, PBS)])
