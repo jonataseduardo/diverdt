@@ -44,4 +44,6 @@ peaks_median <-
             score_col = 'LOG_PVAL', score_th = 0.01, 
             window_s = 20, greater = FALSE)
 
+peaks_median[CHR == 2]
+
 manhattan_plot(pbs_median, col_name = 'LOG_PVAL', fig_name = 'median_illumina.png')
