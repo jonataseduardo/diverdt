@@ -6,13 +6,14 @@
 #' @export 
 #'
 #' @param freq_data data.table. Data with one allele per line. 
-#' @param maf_th float. MAF threshold. Default maf_th = 0.05
+#' @param maf_th float. MAF threshold. Default maf_th = NULL to consider 
+#' every polymorphic site
 #'
 #' @return data.table  
 
 maf_filter <-
   function(freq_data,
-           maf_th = 0.05,
+           maf_th = NULL,
            inplace = FALSE){
 
   if(inplace){
@@ -22,9 +23,15 @@ maf_filter <-
   }
    
   f_data[, N0 := .N, keyby = .(CHR, POS)]
-  f_data[AF > maf_th, N1 := .N, by = .(CHR, POS)]
+  if(is.null(maf_th)){
+    f_data[, maf_th := 1 / NCHROBS]
+    f_data[AF > maf_th, N1 := .N, by = .(CHR, POS)]
+  }else{
+    f_data[, maf_th := maf_th]
+    f_data[AF > maf_th, N1 := .N, by = .(CHR, POS)]
+  }
   f_data <- f_data[N0 == N1]
-  f_data[, c('N0', 'N1') := NULL]
+  f_data[, c('N0', 'N1', 'maf_th') := NULL]
 
   setkey(f_data, CHR, POS)
   return(f_data[])
