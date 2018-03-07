@@ -18,7 +18,8 @@ pop_list1 <-
       }
     )
 
-pop_list <- lapply(pop_list1, maf_filter)
+#pop_list <- lapply(pop_list1, maf_filter)
+pop_list <- pop_list1
 
 fst_eur_afr <- 
   wc_fst(pop_list[c(1,2)])
@@ -40,9 +41,9 @@ pbs_mean <-
   rolling_mean_n(pbs_data, col_name = 'PBS', window_s = 20, step_s = 5)
 
 pbs_mean[, P_RANK := 1 - frankv(PBS_MEAN) / (.N + 1)]
-pbs_mean[, LOG_PVAL := -log(P_RANK)]
-
+pbs_mean[, LOG_PVAL := - log(P_RANK)]
 pbs_mean[, 1 / .N]
+
 peaks_mean <- 
   get_peaks(pbs_data, pbs_mean, stat_col = 'PBS', 
             score_col = 'P_RANK', score_th = 0.01, 
