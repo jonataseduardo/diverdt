@@ -25,7 +25,12 @@ pop_list <- pop_list1
 fst_eur_afr <- 
   wc_fst(pop_list[c(1,2)])
 
-fst_eur_afr
+fst_eur_afr1 <- 
+  hudson_fst(pop_list[c(1,2)])
+
+
+fst_eur_afr[,.(mean(T1, na.rm = TRUE), mean(T2, na.rm = TRUE), mean(FST)), CHR] 
+fst_eur_afr1[,.(mean(T1, na.rm = TRUE), mean(T2, na.rm = TRUE), mean(FST)), CHR] 
 
 pbs_data <-  
   pbs_fst(pop_list[[1]], pop_list[[2]], pop_list[[3]])
