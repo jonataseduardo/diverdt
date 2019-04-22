@@ -4,7 +4,7 @@
 \alias{manhattan_plot}
 \title{Draw a manhattan plot from data}
 \usage{
-manhattan_plot(DT_in, fig_name = NULL, facet_key = NULL)
+manhattan_plot(DT_in, col_name, fig_name = NULL, facet_key = NULL)
 }
 \arguments{
 \item{facet_key}{}

@@ -4,8 +4,8 @@
 \alias{load_bim_frq}
 \title{Create data.table with CHR, SNP, POS, AF, POP columns}
 \usage{
-load_bim_frq(files_path, pop_name = tail(unlist(strsplit(files_path, "/")), n
-  = 1), one_allele_perline = TRUE)
+load_bim_frq(files_path, pop_name = tail(unlist(strsplit(files_path,
+  "/")), n = 1), one_allele_perline = TRUE)
 }
 \arguments{
 \item{files_path}{string with full path of .bim and .frq files}
