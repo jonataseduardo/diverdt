@@ -20,9 +20,12 @@ pop_list1 <-
 
 #pop_list <- lapply(pop_list1, maf_filter)
 pop_list <- pop_list1
+#pop_list <- pop_list[c(1,2)]
 
 fst_eur_afr <- 
   wc_fst(pop_list[c(1,2)])
+
+fst_eur_afr
 
 pbs_data <-  
   pbs_fst(pop_list[[1]], pop_list[[2]], pop_list[[3]])

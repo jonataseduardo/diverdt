@@ -10,8 +10,6 @@
 #' 
 #' @return data.table with Fst estimated for every SNP 
 
-
-
 hudson_fst <-
     function(pop_list){
 
@@ -37,9 +35,9 @@ hudson_fst <-
                ][pop_dt[POP == pops[2, POP]], 
                  on = c("CHR", "CM", "POS", "SNP")]
 
-      fst_dt[, `:=`(T1 = (AF - i.AF) ^ 2 + 
-                         AF * (1 - AF) / NCHROBS + 
-                         i.AF * (1 - i.AF) / i.NCHROBS,
+      fst_dt[, `:=`(T1 = (AF - i.AF) ^ 2  
+                        - AF * (1 - AF) / (NCHROBS - 1)
+                        - i.AF * (1 - i.AF) / (i.NCHROBS - 1),
                     T2 = AF * (1 - i.AF) + i.AF * (1 - AF)
                     )]
 
@@ -49,5 +47,6 @@ hudson_fst <-
 
       return(fst_dt[])
     }else{
-      print('Hudson Fst is evalalueter
+      print('Hudson Fst is evalueted for 2 populations')
+    }
     }
