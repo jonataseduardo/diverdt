@@ -3,6 +3,7 @@ library(ggplot2)
 
 #library(diverdt)
 devtools::load_all('~/diverdt')
+devtools::document('~/diverdt')
 
 pops <- c('EUR', 'EAS', 'AFR')
 
@@ -20,14 +21,15 @@ pop_list1 <-
 
 #pop_list <- lapply(pop_list1, maf_filter)
 pop_list <- pop_list1
-#pop_list <- pop_list[c(1,2)]
+pop_list <- pop_list1[c(1,2)]
 
 fst_eur_afr <- 
   wc_fst(pop_list[c(1,2)])
 
 fst_eur_afr1 <- 
-  hudson_fst(pop_list[c(1,2)])
+  hudson_fst(pop_list)
 
+fst_eur_afr1
 
 fst_eur_afr[,.(mean(T1, na.rm = TRUE), mean(T2, na.rm = TRUE), mean(FST)), CHR] 
 fst_eur_afr1[,.(mean(T1, na.rm = TRUE), mean(T2, na.rm = TRUE), mean(FST)), CHR] 

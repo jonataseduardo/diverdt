@@ -30,9 +30,11 @@ hudson_fst <-
 
       pops <- pop_dt[, .GRP, POP]
 
+      scols <- c("CHR", "CM", "POS", "SNP", "AF", "NCHROBS")
+
       fst_dt <- 
-        pop_dt[POP == pops[1, POP]
-               ][pop_dt[POP == pops[2, POP]], 
+        pop_dt[POP == pops[1, POP], ..scols,
+               ][pop_dt[POP == pops[2, POP], ..scols],
                  on = c("CHR", "CM", "POS", "SNP")]
 
       fst_dt[, `:=`(T1 = (AF - i.AF) ^ 2  
@@ -41,11 +43,10 @@ hudson_fst <-
                     T2 = AF * (1 - i.AF) + i.AF * (1 - AF)
                     )]
 
-      fst_dt[, c('NCHROBS', 'POP', 'AF', 'i.NCHROBS', 'i.POP', 'i.AF') := NULL]
       fst_dt[, FST := T1 / T2]
       fst_dt[ (FST < 0) | is.na(FST) , FST := 0] 
 
-      return(fst_dt[])
+      return(fst_dt[, c("CHR", "CM", "POS", "SNP", "T1", "T2", "FST"), with = FALSE])
     }else{
       print('Hudson Fst is evalueted for 2 populations')
     }
