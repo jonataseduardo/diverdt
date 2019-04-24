@@ -15,32 +15,23 @@ hudson_fst <-
 
     r <- length(pop_list)
     if(r == 2){
-      pop_dt <- rbindlist(pop_list)
 
-      setkeyv(pop_dt, c("CHR", "CM", "POS", "VAR", "SNP"))
+      pop1_dt <- pop_list[[1]]
+      pop2_dt <- pop_list[[2]]
 
-      pop_dt <- pop_dt[pop_dt[, .N , by = .(CHR, CM, POS, VAR, SNP)][N == r]]
-      pop_dt[, N := NULL]
-      pop_dt[, G := .GRP, by = .(CHR, CM, POS, VAR, SNP)]
 
-      # Assuming biallelic data select one variant to estimate the Fst 
-      pop_dt <- pop_dt[G %% 2 != 0]
-      pop_dt[, `:=`(G = NULL, VAR = NULL)]
-      setkeyv(pop_dt, c("CHR", "CM", "POS", "SNP"))
+      on_cols = c("CHR", "CM", "POS", "VAR", "SNP")
+      scols = c("AF", "NCHROBS", "POP", on_cols)
 
-      pops <- pop_dt[, .GRP, POP]
+      fst_dt <- merge(pop1_dt[, ..scols], 
+                      pop2_dt[, ..scols], 
+                      by = on_cols,
+                      all = TRUE)
 
-      scols <- c("CHR", "CM", "POS", "SNP", "AF", "NCHROBS")
-
-      fst_dt <- 
-        pop_dt[POP == pops[1, POP], ..scols,
-               ][pop_dt[POP == pops[2, POP], ..scols],
-                 on = c("CHR", "CM", "POS", "SNP")]
-
-      fst_dt[, `:=`(T1 = (AF - i.AF) ^ 2  
-                        - AF * (1 - AF) / (NCHROBS - 1)
-                        - i.AF * (1 - i.AF) / (i.NCHROBS - 1),
-                    T2 = AF * (1 - i.AF) + i.AF * (1 - AF)
+      fst_dt[, `:=`(T1 = (AF.y - AF.x) ^ 2  
+                        - AF.y * (1 - AF.y) / (NCHROBS.y - 1)
+                        - AF.x * (1 - AF.x) / (NCHROBS.x - 1),
+                    T2 = AF.y * (1 - AF.x) + AF.x * (1 - AF.y)
                     )]
 
       fst_dt[, FST := T1 / T2]
