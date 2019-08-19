@@ -20,8 +20,8 @@ hudson_fst <-
       pop2_dt <- pop_list[[2]]
 
 
-      on_cols = c("CHR", "CM", "POS", "VAR", "SNP")
-      scols = c("AF", "NCHROBS", "POP", on_cols)
+      on_cols = c("CHROM", "POS", "ID", "REF", "ALT")
+      scols = c("AF", "OBS_CT", "POP", on_cols)
 
       fst_dt <- merge(pop1_dt[, ..scols], 
                       pop2_dt[, ..scols], 
@@ -29,15 +29,16 @@ hudson_fst <-
                       all = TRUE)
 
       fst_dt[, `:=`(T1 = (AF.y - AF.x) ^ 2  
-                        - AF.y * (1 - AF.y) / (NCHROBS.y - 1)
-                        - AF.x * (1 - AF.x) / (NCHROBS.x - 1),
+                        - AF.y * (1 - AF.y) / (OBS_CT.y - 1)
+                        - AF.x * (1 - AF.x) / (OBS_CT.x - 1),
                     T2 = AF.y * (1 - AF.x) + AF.x * (1 - AF.y)
                     )]
 
       fst_dt[, FST := T1 / T2]
       fst_dt[ (FST < 0) | is.na(FST) , FST := 0] 
+      fst_dt[ T1 < 0, T1 := 0] 
 
-      return(fst_dt[, c("CHR", "CM", "POS", "SNP", "T1", "T2", "FST"), with = FALSE])
+      return(fst_dt[, c(on_cols, "T1", "T2", "FST"), with = FALSE])
     }else{
       print('Hudson Fst is evalueted for 2 populations')
     }
